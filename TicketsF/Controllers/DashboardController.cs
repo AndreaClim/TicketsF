@@ -16,17 +16,14 @@ namespace TicketsF.Controllers
         // Acción para mostrar el Dashboard
         public IActionResult Index()
         {
-            // Obtener las estadísticas de los tickets desde la base de datos
-            var totalTickets = _context.tickets.Count(); // Total de tickets
-            var ticketsAbiertos = _context.tickets.Where(t => t.id_estado == 1).Count(); // Tickets abiertos
-            var ticketsEnProgreso = _context.tickets.Where(t => t.id_estado == 2).Count(); // Tickets en progreso
-            var ticketsResueltos = _context.tickets.Where(t => t.id_estado == 4).Count(); // Tickets resueltos
+            var totalTickets = _context.tickets.Count();
+            var ticketsAbiertos = _context.tickets.Where(t => t.id_estado == 1).Count();
+            var ticketsEnProgreso = _context.tickets.Where(t => t.id_estado == 2).Count();
+            var ticketsResueltos = _context.tickets.Where(t => t.id_estado == 4).Count();
 
-            // Obtener todos los usuarios y filtrar clientes y empleados
             var clientes = _context.usuarios.Where(u => u.roles == "Cliente").ToList();
-            var usuarios = _context.usuarios.Where(u => u.roles != "Cliente").ToList(); // Todos los empleados
+            var usuarios = _context.usuarios.ToList();
 
-            // Crear el objeto DashboardData
             var dashboardData = new DashboardData
             {
                 TotalTickets = totalTickets,
@@ -37,8 +34,9 @@ namespace TicketsF.Controllers
                 Usuarios = usuarios
             };
 
-            return View(dashboardData); // Pasar la instancia de DashboardData a la vista
+            return View(dashboardData);
         }
+
         public IActionResult Eliminar(int id)
         {
             var usuario = _context.usuarios.Find(id);

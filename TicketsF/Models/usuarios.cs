@@ -29,6 +29,6 @@ namespace TicketsF.Models
 
       
         [Column("roles")]
-        public string roles { get; set; }  // 'Administrador', 'Técnico', 'Cliente'
+        public string roles { get; set; }  
     }
 }
