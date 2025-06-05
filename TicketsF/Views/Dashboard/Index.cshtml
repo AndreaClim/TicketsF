@@ -1,0 +1,203 @@
+﻿@{
+    ViewData["Title"] = "Panel de Empleado - TechSoluciones";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            padding-bottom: 80px;
+        }
+
+        .form-control {
+            background-color: #363636;
+            border: none;
+            color: #e0e0e0;
+        }
+
+            .form-control:focus {
+                background-color: #1f1f1f;
+                color: #fff;
+                box-shadow: 0 0 0 0.25rem rgba(75, 102, 138, 0.5);
+            }
+
+        .form-label {
+            color: #ffffff;
+        }
+
+        .btn-custom {
+            background-color: #4b668a;
+            color: white;
+        }
+
+            .btn-custom:hover {
+                background-color: #3a526f;
+            }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #1a1a1a;
+            color: #aaa;
+            text-align: center;
+            padding: 1rem 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">TechSoluciones</a>
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon text-light"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto"></ul>
+                <a href="index.html" class="btn-login">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Tabs -->
+    <div class="container mt-4 mb-5">
+        <ul class="nav nav-tabs" id="empleadoTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">Dashboard</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="clientes-tab" data-bs-toggle="tab" data-bs-target="#clientes" type="button" role="tab">Clientes</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets" type="button" role="tab">Tickets</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab">Usuarios</button>
+            </li>
+        </ul>
+
+        <div class="tab-content bg-dark p-4 rounded-bottom text-white" id="empleadoTabsContent">
+            <!-- DASHBOARD -->
+            <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+                <h4 class="mb-4">Dashboard</h4>
+                <div class="row text-center mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Tickets Resueltos</h5>
+                                <p>@Model.TicketsResueltos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-warning text-dark shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">En Progreso</h5>
+                                <p>@Model.TicketsEnProgreso</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-danger text-white shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Tickets Abiertos</h5>
+                                <p>@Model.TicketsAbiertos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLIENTES -->
+            <div class="tab-pane fade" id="clientes" role="tabpanel">
+                <h4>Gestión de Clientes</h4>
+                <table class="table table-dark table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cliente in Model.Clientes)
+                        {
+                            <tr>
+                                <td>@cliente.nombre</td>
+                                <td>@cliente.correo</td>
+                                <td>@cliente.telefono</td>
+                                <td>
+                                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash-alt"></i></button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TICKETS -->
+            <div class="tab-pane fade" id="tickets" role="tabpanel">
+                <h4 class="mb-4">Tickets Activos</h4>
+                <table class="table table-dark table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Descripción</th>
+                            <th>Prioridad</th>
+                            <th>Estado</th>
+                            <th>Asignado a</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí agregarás los datos de los tickets -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- USUARIOS -->
+            <div class="tab-pane fade" id="usuarios" role="tabpanel">
+                <h4>Administración de Usuarios</h4>
+                <table class="table table-dark table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Rol</th>
+                            <th>Email</th>
+                            <th>Permiso</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí agregarás los datos de los usuarios -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+ 
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

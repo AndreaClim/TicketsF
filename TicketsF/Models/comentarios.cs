@@ -1,7 +1,10 @@
-﻿namespace TicketsF.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TicketsF.Models
 {
     public class comentarios
     {
+        [Key]
         public int id_comentario { get; set; }
         public string comentario { get; set; }
         public DateTime fecha { get; set; }
