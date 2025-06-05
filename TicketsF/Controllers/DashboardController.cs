@@ -22,11 +22,11 @@ namespace TicketsF.Controllers
             var ticketsEnProgreso = _context.tickets.Where(t => t.id_estado == 2).Count(); // Tickets en progreso
             var ticketsResueltos = _context.tickets.Where(t => t.id_estado == 4).Count(); // Tickets resueltos
 
-            // Obtener todos los clientes (opcional)
+            // Obtener todos los clientes
             var clientes = _context.usuarios.ToList();
 
-            // Preparar los datos para pasar a la vista
-            var dashboardData = new
+            // Crear el objeto DashboardData
+            var dashboardData = new DashboardData
             {
                 TotalTickets = totalTickets,
                 TicketsAbiertos = ticketsAbiertos,
@@ -35,7 +35,7 @@ namespace TicketsF.Controllers
                 Clientes = clientes
             };
 
-            return View(dashboardData); // Pasamos los datos al Dashboard
+            return View(dashboardData); // Pasar la instancia de DashboardData a la vista
         }
     }
 }

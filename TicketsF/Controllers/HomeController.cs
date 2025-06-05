@@ -41,13 +41,17 @@ namespace TicketsF.Controllers
                 HttpContext.Session.SetInt32("id_usuarios", usuario.id_usuario);
                 HttpContext.Session.SetString("correo", usuario.correo);
 
-                // Redirigir al Dashboard del Administrador si el usuario es administrador
-                if (usuario.roles != null && usuario.roles.id_roles == 1)
+                // Redirigir al Dashboard del Administrador si el usuario tiene rol "Administrador"
+                if (usuario.roles == "Administrador")
                 {
                     return RedirectToAction("Index", "Dashboard"); // Redirigir al Dashboard
                 }
-                // Si no es administrador, redirigir a la vista principal o una página estándar
-                return RedirectToAction("Index", "Home");
+
+                // Si el usuario tiene rol "Técnico" o "Cliente", puedes redirigir a su vista respectiva
+                if (usuario.roles == "Técnico" || usuario.roles == "Cliente")
+                {
+                    return RedirectToAction("Index", "Home"); // O redirigir a una vista estándar si lo prefieres
+                }
             }
             else
             {

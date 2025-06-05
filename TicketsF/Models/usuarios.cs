@@ -25,12 +25,10 @@ namespace TicketsF.Models
         public string telefono { get; set; }
 
         [Column("autenticacion")]
-        public string autenticacion { get; set; }   
+        public string autenticacion { get; set; }
 
-        [Column("id_roles")] 
-        public int id_roles { get; set; }
-
-        [ForeignKey("id_roles")]  
-        public roles_t roles { get; set; }
+      
+        [Column("roles")]
+        public string roles { get; set; }  // 'Administrador', 'Técnico', 'Cliente'
     }
 }
