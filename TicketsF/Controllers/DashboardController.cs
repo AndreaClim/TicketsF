@@ -22,8 +22,9 @@ namespace TicketsF.Controllers
             var ticketsEnProgreso = _context.tickets.Where(t => t.id_estado == 2).Count(); // Tickets en progreso
             var ticketsResueltos = _context.tickets.Where(t => t.id_estado == 4).Count(); // Tickets resueltos
 
-            // Obtener todos los clientes
-            var clientes = _context.usuarios.ToList();
+            // Obtener todos los usuarios y filtrar clientes y empleados
+            var clientes = _context.usuarios.Where(u => u.roles == "Cliente").ToList();
+            var usuarios = _context.usuarios.Where(u => u.roles != "Cliente").ToList(); // Todos los empleados
 
             // Crear el objeto DashboardData
             var dashboardData = new DashboardData
@@ -32,10 +33,36 @@ namespace TicketsF.Controllers
                 TicketsAbiertos = ticketsAbiertos,
                 TicketsEnProgreso = ticketsEnProgreso,
                 TicketsResueltos = ticketsResueltos,
-                Clientes = clientes
+                Clientes = clientes,
+                Usuarios = usuarios
             };
 
             return View(dashboardData); // Pasar la instancia de DashboardData a la vista
         }
+        public IActionResult Eliminar(int id)
+        {
+            var usuario = _context.usuarios.Find(id);
+            if (usuario != null)
+            {
+                _context.usuarios.Remove(usuario);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Dashboard");
+        }
+
+        public IActionResult EliminarC(int id)
+        {
+            var cliente = _context.usuarios.Find(id);
+            if (cliente != null)
+            {
+                _context.usuarios.Remove(cliente);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("Index", "Dashboard");
+        }
+
+
     }
 }

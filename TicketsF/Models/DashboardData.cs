@@ -7,6 +7,7 @@
         public int TicketsEnProgreso { get; set; }
         public int TicketsResueltos { get; set; }
         public List<usuarios> Clientes { get; set; }
+        public List<usuarios> Usuarios { get; set; }
     }
 }
 
