@@ -145,6 +145,25 @@ namespace TicketsF.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        public IActionResult Editar(usuarios usuarioEditado)
+        {
+            var usuario = _context.usuarios.FirstOrDefault(u => u.id_usuarios == usuarioEditado.id_usuarios);
+
+            if (usuario == null)
+                return NotFound();
+
+            usuario.nombre = usuarioEditado.nombre;
+            usuario.apellido = usuarioEditado.apellido;
+            usuario.correo = usuarioEditado.correo;
+            usuario.telefono = usuarioEditado.telefono;
+            usuario.autenticacion = usuarioEditado.autenticacion;
+            usuario.roles = usuarioEditado.roles;
+
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
 
 
 
