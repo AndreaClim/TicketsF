@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Tickets1</title>
+
+    <!-- Bootstrap & Font Awesome -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Tickets1.styles.css" asp-append-version="true" />
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            padding-bottom: 80px;
+        }
+
+        .form-control {
+            background-color: #363636;
+            border: none;
+            color: #e0e0e0;
+        }
+
+            .form-control:focus {
+                background-color: #1f1f1f;
+                color: #fff;
+                box-shadow: 0 0 0 0.25rem rgba(75, 102, 138, 0.5);
+            }
+
+        .form-label {
+            color: #ffffff;
+        }
+
+        .btn-custom {
+            background-color: #4b668a;
+            color: white;
+        }
+
+            .btn-custom:hover {
+                background-color: #3a526f;
+            }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #1a1a1a;
+            color: #aaa;
+            text-align: center;
+            padding: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        /* NAVBAR full width y color */
+        .navbar {
+            width: 100%;
+            background-color: #1f1f1f !important;
+            border-bottom: 1px solid #333;
+        }
+
+            .navbar .navbar-brand {
+                color: #e0e0e0;
+                font-weight: bold;
+            }
+
+                .navbar .navbar-brand:hover {
+                    color: #ffffff;
+                }
+
+        .btn-login {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .btn-login:hover {
+                color: #ffffff;
+            }
+
+        /* TABS */
+        .nav-tabs .nav-link {
+            color: #ccc;
+            background-color: #2a2a2a;
+            border: 1px solid transparent;
+            margin-right: 5px;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+            .nav-tabs .nav-link:hover {
+                background-color: #3b3b3b;
+                color: #fff;
+            }
+
+            .nav-tabs .nav-link.active {
+                background-color: #4b668a;
+                color: #fff;
+                border-color: transparent;
+                font-weight: bold;
+                border-bottom: none;
+            }
+
+
+        .tab-content {
+            border-top: none;
+        }
+
+        .nav-tabs {
+            border-bottom: none !important;
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">TechSoluciones</a>
+            <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto"></ul>
+                <a href="~/Home/Index" class="btn-login text-decoration-none">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        © 2025 TechSoluciones - Tu aliado en tecnología empresarial
+    </footer>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
