@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Generar Ticket";
+    Layout = "_LayoutD";
+}
+
+@section Styles {
+    <style>
+        .campos-blancos {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            border: 1px solid #ccc !important;
+        }
+
+            .campos-blancos:focus {
+                border-color: #4b668a !important;
+                box-shadow: 0 0 0 0.2rem rgba(75, 102, 138, 0.25) !important;
+                outline: none !important;
+            }
+
+        .form-container .card {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+    </style>
+}
+
+<div class="container mt-5 form-container text-light">
+    <h2 class="text-center mb-4">¿Necesitas reportar un problema o solicitar un servicio nuevo?</h2>
+    <p class="text-center">Contacta con soporte generando un ticket.</p>
+
+    <div class="card p-4">
+        <form asp-controller="Usuarios" asp-action="GenerarTicket" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="asunto" class="form-label">Asunto del ticket</label>
+                <select class="form-control campos-blancos" id="asunto" name="asunto" required>
+                    <option value="" disabled selected>Selecciona un asunto...</option>
+                    <option value="Problema técnico">Problema técnico</option>
+                    <option value="Solicitud de acceso">Solicitud de acceso</option>
+                    <option value="Instalación de software">Instalación de software</option>
+                    <option value="Consulta general">Consulta general</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="descripcionProblema" class="form-label">Descripción del Problema</label>
+                <textarea class="form-control campos-blancos" id="descripcionProblema" name="descripcionProblema" rows="4" required></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="appName" class="form-label">Nombre de la Aplicación o Servicio</label>
+                <input type="text" class="form-control campos-blancos" id="appName" name="appName" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="archivo" class="form-label">Adjuntar archivos (opcional)</label>
+                <input type="file" class="form-control campos-blancos" id="archivo" name="archivo" multiple />
+            </div>
+
+            <div class="mb-3">
+                <label for="prioridad" class="form-label">Prioridad</label>
+                <select class="form-control campos-blancos" id="prioridad" name="prioridad" required>
+                    <option value="critico">Crítico</option>
+                    <option value="importante">Importante</option>
+                    <option value="baja">Baja</option>
+                </select>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-ticket-alt"></i> Generar Ticket
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

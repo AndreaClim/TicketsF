@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TicketsF.Models;
+using TicketsF.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,9 @@ builder.Services.AddSession(options =>
 // Configura los servicios y la base de datos
 builder.Services.AddDbContext<ticketsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TicketsDbConnection")));
+
+builder.Services.AddScoped<ICorreoServicio, CorreoServicio>();
+
 
 var app = builder.Build();
 

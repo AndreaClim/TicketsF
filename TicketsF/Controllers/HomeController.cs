@@ -50,11 +50,16 @@ namespace TicketsF.Controllers
                     return RedirectToAction("Index", "Dashboard");
                 }
 
-                
-                if (usuario.roles == "Técnico" || usuario.roles == "Cliente")
+
+                if (usuario.roles == "Técnico")
                 {
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "TecnicoController1");
                 }
+                else if (usuario.roles == "Cliente")
+                {
+                    return RedirectToAction("GenerarTicket", "Usuarios");
+                }
+                
             }
             else
             {
