@@ -68,22 +68,8 @@ namespace TicketsF.Controllers
             return RedirectToAction("Index", "Dashboard");
         }
 
-        public IActionResult Eliminar(int id, bool esCliente = false)
-        {
-           
-            var usuario = _context.usuarios.Find(id);
+  
 
-            if (usuario != null)
-            {
-               
-                _context.usuarios.Remove(usuario);
-                _context.SaveChanges();
-            }
-
-         
-            return RedirectToAction("Index", "Dashboard");
-
-        }
 
         public IActionResult ResolverTicket(int id, int idUsuarioAsignado, int idPrioridad, int idEstado)
         {
