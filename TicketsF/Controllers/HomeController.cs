@@ -38,7 +38,7 @@ namespace TicketsF.Controllers
             if (usuario != null)
             {
                 
-                HttpContext.Session.SetInt32("id_usuarios", usuario.id_usuario);
+                HttpContext.Session.SetInt32("id_usuarios", usuario.id_usuarios);
                 HttpContext.Session.SetString("correo", usuario.correo);
 
                

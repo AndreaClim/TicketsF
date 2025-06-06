@@ -107,15 +107,41 @@ namespace TicketsF.Controllers
         [HttpGet]
         public IActionResult Eliminar(int id)
         {
-            var usuario = _context.usuarios.Find(id);
-            if (usuario != null)
-            {
-                _context.usuarios.Remove(usuario);
-                _context.SaveChanges();
-            }
+            var usuario = _context.usuarios.FirstOrDefault(u => u.id_usuarios == id);
+
+            if (usuario == null)
+                return NotFound();
+
+            // Eliminar comentarios del usuario
+            var comentarios = _context.comentarios.Where(c => c.id_usuarios == id).ToList();
+            _context.comentarios.RemoveRange(comentarios);
+
+            // Eliminar notificaciones del usuario
+            var notificaciones = _context.notificaciones.Where(n => n.id_usuarios == id).ToList();
+            _context.notificaciones.RemoveRange(notificaciones);
+
+            // Eliminar historial relacionado al usuario (si aplicara)
+            var historial = _context.historial.Where(h => h.id_ticket != null &&
+                (_context.tickets.Any(t => t.id_ticket == h.id_ticket &&
+                (t.id_usuarioC == id || t.id_usuarioE == id)))).ToList();
+            _context.historial.RemoveRange(historial);
+
+            // Eliminar tickets donde el usuario es cliente
+            var ticketsCliente = _context.tickets.Where(t => t.id_usuarioC == id).ToList();
+            _context.tickets.RemoveRange(ticketsCliente);
+
+            // Eliminar tickets donde el usuario es técnico
+            var ticketsTecnico = _context.tickets.Where(t => t.id_usuarioE == id).ToList();
+            _context.tickets.RemoveRange(ticketsTecnico);
+
+            // Finalmente, eliminar el usuario
+            _context.usuarios.Remove(usuario);
+
+            _context.SaveChanges();
 
             return RedirectToAction("Index");
         }
+
 
 
 

@@ -7,7 +7,7 @@ namespace TicketsF.Models
     {
         [Key]
         [Column("id_usuarios")]  // Aseguramos que 'id_usuarios' corresponde con la columna de la base de datos
-        public int id_usuario { get; set; }
+        public int id_usuarios { get; set; }
 
         [Column("nombre")]
         public string nombre { get; set; }

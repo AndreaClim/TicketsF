@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Net.Sockets;
 
 namespace TicketsF.Models
 {
@@ -8,10 +10,14 @@ namespace TicketsF.Models
         public int id_comentario { get; set; }
         public string comentario { get; set; }
         public DateTime fecha { get; set; }
-        public int id_ticket { get; set; }
-        public tickets ticket { get; set; }
-        public int id_usuario { get; set; }
-        public usuarios usuario { get; set; }
 
+        [ForeignKey("ticket")]
+        public int id_ticket { get; set; }
+
+        [ForeignKey("usuario")]
+        public int id_usuarios { get; set; }
+        // Relaciones
+        public tickets ticket { get; set; }
+        public usuarios usuario { get; set; }
     }
 }

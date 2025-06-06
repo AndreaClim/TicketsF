@@ -75,10 +75,10 @@
                             <td>@cliente.correo</td>
                             <td>@cliente.telefono</td>
                             <td>
-                                <button class="btn btn-sm btn-warning" onclick="editUsuario(@cliente.id_usuario)">
+                                <button class="btn btn-sm btn-warning" onclick="editUsuario(@cliente.id_usuarios)">
                                     <i class="fas fa-edit"></i> Editar
                                 </button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteItem(@cliente.id_usuario)">
+                                <button class="btn btn-sm btn-danger" onclick="deleteItem(@cliente.id_usuarios)">
                                     <i class="fas fa-trash-alt"></i> Eliminar
                                 </button>
                             </td>
@@ -134,7 +134,7 @@
                                 <select class="form-select" id="usuarioE_@ticket.id_ticket">
                                     @foreach (var usuario in Model.Usuarios.Where(u => u.roles != "Cliente"))
                                     {
-                                        <option value="@usuario.id_usuario" selected="@(ticket.id_usuarioE == usuario.id_usuario)">
+                                        <option value="@usuario.id_usuarios" selected="@(ticket.id_usuarioE == usuario.id_usuarios)">
                                             @usuario.nombre
                                         </option>
                                     }
@@ -180,10 +180,10 @@
                             <td>@usuario.autenticacion</td>
                             <td>@usuario.roles</td>
                             <td>
-                                <button class="btn btn-sm btn-warning" onclick="editUsuario(@usuario.id_usuario)">
+                                <button class="btn btn-sm btn-warning" onclick="editUsuario(@usuario.id_usuarios)">
                                     <i class="fas fa-edit"></i> Editar
                                 </button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteItem(@usuario.id_usuario)">
+                                <button class="btn btn-sm btn-danger" onclick="deleteItem(@usuario.id_usuarios)">
                                     <i class="fas fa-trash-alt"></i> Eliminar
                                 </button>
                             </td>
