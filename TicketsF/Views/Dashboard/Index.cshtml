@@ -1,6 +1,9 @@
 ﻿@model TicketsF.Models.DashboardData
+@using Newtonsoft.Json
+
 
 @{
+
     ViewData["Title"] = "Panel de Empleado - TechSoluciones";
     Layout = "_LayoutD";
 }
@@ -24,50 +27,45 @@
     <div class="tab-content bg-dark p-4 rounded-bottom text-white" id="empleadoTabsContent">
         <!-- DASHBOARD -->
         <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
-            <div id="dashboard-content">
-                <h4 class="mb-4">Dashboard</h4>
-                <div class="row text-center mb-4">
-                    <div class="col-md-4">
-                        <div class="card bg-success text-white shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">Tickets Resueltos</h5>
-                                <p>@Model.TicketsResueltos</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card bg-warning text-dark shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">En Progreso</h5>
-                                <p>@Model.TicketsEnProgreso</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card bg-danger text-white shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">Tickets Abiertos</h5>
-                                <p>@Model.TicketsAbiertos</p>
-                            </div>
+            <h4 class="mb-4">Dashboard</h4>
+            <div class="row text-center mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-success text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Tickets Resueltos</h5>
+                            <p>@Model.TicketsResueltos</p>
                         </div>
                     </div>
                 </div>
-
-                <div class="row text-center mb-4">
-                    <div class="col-md-4">
-                        <div class="card bg-info text-white shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">En Espera de Cliente</h5>
-                                <p>@Model.TicketsEnEspera</p>
-                            </div>
+                <div class="col-md-4">
+                    <div class="card bg-warning text-dark shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">En Progreso</h5>
+                            <p>@Model.TicketsEnProgreso</p>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card bg-secondary text-white shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">Cerrados</h5>
-                                <p>@Model.TicketsCerrados</p>
-                            </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-danger text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Tickets Abiertos</h5>
+                            <p>@Model.TicketsAbiertos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <div class="card bg-info text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">En Espera de Cliente</h5>
+                            <p>@Model.TicketsEnEspera</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <div class="card bg-secondary text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Cerrados</h5>
+                            <p>@Model.TicketsCerrados</p>
                         </div>
                     </div>
                 </div>
@@ -214,6 +212,55 @@
     </div>
 </div>
 
+<!-- MODAL PARA EDITAR USUARIO -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Editar Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm" method="post" action="/Dashboard/Editar">
+                    <input type="hidden" id="editId" name="id_usuarios" />
+                    <div class="mb-3">
+                        <label for="editNombre" class="form-label">Nombre</label>
+                        <input type="text" class="form-control" id="editNombre" name="nombre" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editApellido" class="form-label">Apellido</label>
+                        <input type="text" class="form-control" id="editApellido" name="apellido" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCorreo" class="form-label">Correo</label>
+                        <input type="email" class="form-control" id="editCorreo" name="correo" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTelefono" class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" id="editTelefono" name="telefono" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editAutenticacion" class="form-label">Autenticación</label>
+                        <input type="text" class="form-control" id="editAutenticacion" name="autenticacion" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="editRoles" class="form-label">Rol</label>
+                        <select class="form-select" id="editRoles" name="roles">
+                            <option value="Cliente">Cliente</option>
+                            <option value="Empleado">Empleado</option>
+                            <option value="Administrador">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -251,6 +298,21 @@
     function deleteItem(id) {
         if (confirm("¿Estás seguro de que quieres eliminar este elemento?")) {
             window.location.href = `/Dashboard/Eliminar?id=${id}`;
+        }
+    }
+
+    function editUsuario(id) {
+        const usuarios = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Usuarios));
+        const user = usuarios.find(u => u.id_usuarios === id);
+        if (user) {
+            $('#editId').val(user.id_usuarios);
+            $('#editNombre').val(user.nombre);
+            $('#editApellido').val(user.apellido);
+            $('#editCorreo').val(user.correo);
+            $('#editTelefono').val(user.telefono);
+            $('#editAutenticacion').val(user.autenticacion);
+            $('#editRoles').val(user.roles);
+            $('#editUserModal').modal('show');
         }
     }
 </script>
