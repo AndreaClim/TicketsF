@@ -200,7 +200,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    function resolverTicket(id) {
+        function resolverTicket(id) {
         var idUsuarioAsignado = document.getElementById('usuarioE_' + id).value;
         var idPrioridad = document.getElementById('prioridad_' + id).value;
         var idEstado = document.getElementById('estado_' + id).value;
@@ -214,17 +214,21 @@
                 idPrioridad: idPrioridad,
                 idEstado: idEstado
             },
-            success: function (response) {
-                $('#ticket-row-' + id).fadeOut(300, function () {
-                    $(this).remove();
-                });
-                $('#dashboard-content').html(response);
+            success: function (estadoRecibido) {
+                if (estadoRecibido == 4 || estadoRecibido == 5) {
+                    $('#ticket-row-' + id).fadeOut(300, function () {
+                        $(this).remove();
+                    });
+                } else {
+                    alert("Ticket actualizado con estado ID: " + estadoRecibido);
+                }
             },
             error: function (error) {
                 console.log("Error al resolver el ticket:", error);
             }
         });
     }
+
 
     function deleteItem(id) {
         if (confirm("¿Estás seguro de que quieres eliminar este elemento?")) {

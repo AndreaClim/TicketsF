@@ -64,7 +64,7 @@ namespace TicketsF.Controllers
             {
                 ticket.id_usuarioE = idUsuarioAsignado;
                 ticket.id_prioridad = idPrioridad;
-                ticket.id_estado = 4; // Marcar como resuelto
+                ticket.id_estado = idEstado;
                 _context.SaveChanges();
             }
 
@@ -100,7 +100,9 @@ namespace TicketsF.Controllers
                 Estado = estados
             };
 
-            return PartialView("_Dashboard", dashboardData);
+            _context.SaveChanges();
+
+            return Ok(idEstado);
         }
 
 
