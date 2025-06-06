@@ -1,0 +1,29 @@
+﻿@model TicketsF.Models.DashboardData
+
+<!-- Solo la parte del Dashboard que debe actualizarse -->
+<div class="row text-center mb-4">
+    <div class="col-md-4">
+        <div class="card bg-success text-white shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Tickets Resueltos</h5>
+                <p>@Model.TicketsResueltos</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-dark shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">En Progreso</h5>
+                <p>@Model.TicketsEnProgreso</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-danger text-white shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Tickets Abiertos</h5>
+                <p>@Model.TicketsAbiertos</p>
+            </div>
+        </div>
+    </div>
+</div>

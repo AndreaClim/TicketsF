@@ -9,8 +9,7 @@
         public List<usuarios> Clientes { get; set; }
         public List<usuarios> Usuarios { get; set; }
         public List<tickets> Tickets { get; set; }
+        public List<prioridad> Prioridades { get; set; } 
+        public List<estado> Estado { get; set; }
     }
 }
-
-
-
