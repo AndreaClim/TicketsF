@@ -18,15 +18,16 @@ namespace TicketsF.Controllers
         public IActionResult Index()
         {
             var totalTickets = _context.tickets.Count();
-            var ticketsAbiertos = _context.tickets.Where(t => t.id_estado == 1).Count();
-            var ticketsEnProgreso = _context.tickets.Where(t => t.id_estado == 2).Count();
-            var ticketsResueltos = _context.tickets.Where(t => t.id_estado == 4).Count();
+            var ticketsAbiertos = _context.tickets.Count(t => t.id_estado == 1);
+            var ticketsEnProgreso = _context.tickets.Count(t => t.id_estado == 2);
+            var ticketsEnEspera = _context.tickets.Count(t => t.id_estado == 3);
+            var ticketsResueltos = _context.tickets.Count(t => t.id_estado == 4);
+            var ticketsCerrados = _context.tickets.Count(t => t.id_estado == 5);
 
             var clientes = _context.usuarios.Where(u => u.roles == "Cliente").ToList();
             var usuarios = _context.usuarios.ToList();
-
             var tickets = _context.tickets
-                .Where(t => t.id_estado != 4 && t.id_estado != 5)
+                .Where(t => t.id_estado != 5) 
                 .Include(t => t.usuarioC)
                 .Include(t => t.usuarioE)
                 .Include(t => t.estado)
@@ -43,6 +44,8 @@ namespace TicketsF.Controllers
                 TicketsAbiertos = ticketsAbiertos,
                 TicketsEnProgreso = ticketsEnProgreso,
                 TicketsResueltos = ticketsResueltos,
+                TicketsEnEspera = ticketsEnEspera,
+                TicketsCerrados = ticketsCerrados,
                 Clientes = clientes,
                 Usuarios = usuarios,
                 Tickets = tickets,
@@ -52,6 +55,7 @@ namespace TicketsF.Controllers
 
             return View(dashboardData);
         }
+
 
         public IActionResult ResolverTicket(int id, int idUsuarioAsignado, int idPrioridad, int idEstado)
         {
@@ -76,7 +80,7 @@ namespace TicketsF.Controllers
             var clientes = _context.usuarios.Where(u => u.roles == "Cliente").ToList();
             var usuarios = _context.usuarios.ToList();
             var tickets = _context.tickets
-                .Where(t => t.id_estado != 4 && t.id_estado != 5)
+                .Where(t => t.id_estado != 5)
                 .Include(t => t.usuarioC)
                 .Include(t => t.usuarioE)
                 .Include(t => t.estado)
@@ -114,29 +118,26 @@ namespace TicketsF.Controllers
             if (usuario == null)
                 return NotFound();
 
-            // Eliminar comentarios del usuario
+          
             var comentarios = _context.comentarios.Where(c => c.id_usuarios == id).ToList();
             _context.comentarios.RemoveRange(comentarios);
 
-            // Eliminar notificaciones del usuario
             var notificaciones = _context.notificaciones.Where(n => n.id_usuarios == id).ToList();
             _context.notificaciones.RemoveRange(notificaciones);
 
-            // Eliminar historial relacionado al usuario (si aplicara)
             var historial = _context.historial.Where(h => h.id_ticket != null &&
                 (_context.tickets.Any(t => t.id_ticket == h.id_ticket &&
                 (t.id_usuarioC == id || t.id_usuarioE == id)))).ToList();
             _context.historial.RemoveRange(historial);
 
-            // Eliminar tickets donde el usuario es cliente
+      
             var ticketsCliente = _context.tickets.Where(t => t.id_usuarioC == id).ToList();
             _context.tickets.RemoveRange(ticketsCliente);
 
-            // Eliminar tickets donde el usuario es técnico
             var ticketsTecnico = _context.tickets.Where(t => t.id_usuarioE == id).ToList();
             _context.tickets.RemoveRange(ticketsTecnico);
 
-            // Finalmente, eliminar el usuario
+          
             _context.usuarios.Remove(usuario);
 
             _context.SaveChanges();

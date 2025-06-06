@@ -52,6 +52,25 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="row text-center mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">En Espera de Cliente</h5>
+                                <p>@Model.TicketsEnEspera</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-secondary text-white shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Cerrados</h5>
+                                <p>@Model.TicketsCerrados</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -108,7 +127,7 @@
                     {
                         <tr id="ticket-row-@ticket.id_ticket">
                             <td>@ticket.id_ticket</td>
-                            <td>@ticket.usuarioC.nombre</td>
+                            <td>@ticket.usuarioC?.nombre</td>
                             <td>@ticket.descripcion</td>
                             <td>
                                 <select class="form-select" id="prioridad_@ticket.id_ticket">
@@ -200,7 +219,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-        function resolverTicket(id) {
+    function resolverTicket(id) {
         var idUsuarioAsignado = document.getElementById('usuarioE_' + id).value;
         var idPrioridad = document.getElementById('prioridad_' + id).value;
         var idEstado = document.getElementById('estado_' + id).value;
@@ -215,7 +234,7 @@
                 idEstado: idEstado
             },
             success: function (estadoRecibido) {
-                if (estadoRecibido == 4 || estadoRecibido == 5) {
+                if (estadoRecibido == 5) {
                     $('#ticket-row-' + id).fadeOut(300, function () {
                         $(this).remove();
                     });
@@ -228,7 +247,6 @@
             }
         });
     }
-
 
     function deleteItem(id) {
         if (confirm("¿Estás seguro de que quieres eliminar este elemento?")) {

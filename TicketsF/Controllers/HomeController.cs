@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using TicketsF.Models;
 using System.Linq;
+using TicketsF.Servicios;
 
 namespace TicketsF.Controllers
 {
@@ -15,12 +16,14 @@ namespace TicketsF.Controllers
         }
 
         // Acción para manejar tanto el GET como el POST del inicio de sesión
+        [Autenticado]
         [HttpGet]
         public IActionResult Index()
         {
             return View(); 
         }
 
+        [Autenticado]
         [HttpPost]
         public IActionResult Index(string correo, string contrasenia)
         {
