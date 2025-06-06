@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TicketsF.Models;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace TicketsF.Controllers
 {
@@ -24,6 +25,15 @@ namespace TicketsF.Controllers
             var clientes = _context.usuarios.Where(u => u.roles == "Cliente").ToList();
             var usuarios = _context.usuarios.ToList();
 
+           
+            var tickets = _context.tickets
+                .Include(t => t.usuarioC) 
+                .Include(t => t.usuarioE) 
+                .Include(t => t.estado)   
+                .Include(t => t.prioridad) 
+                .Include(t => t.categoria) 
+                .ToList();
+
             var dashboardData = new DashboardData
             {
                 TotalTickets = totalTickets,
@@ -31,11 +41,13 @@ namespace TicketsF.Controllers
                 TicketsEnProgreso = ticketsEnProgreso,
                 TicketsResueltos = ticketsResueltos,
                 Clientes = clientes,
-                Usuarios = usuarios
+                Usuarios = usuarios,
+                Tickets = tickets
             };
 
-            return View(dashboardData);
+            return View(dashboardData); // Pasar la instancia de DashboardData a la vista
         }
+
 
         public IActionResult Eliminar(int id)
         {
@@ -49,17 +61,22 @@ namespace TicketsF.Controllers
             return RedirectToAction("Index", "Dashboard");
         }
 
-        public IActionResult EliminarC(int id)
+        public IActionResult Eliminar(int id, bool esCliente = false)
         {
-            var cliente = _context.usuarios.Find(id);
-            if (cliente != null)
+           
+            var usuario = _context.usuarios.Find(id);
+
+            if (usuario != null)
             {
-                _context.usuarios.Remove(cliente);
+               
+                _context.usuarios.Remove(usuario);
                 _context.SaveChanges();
             }
 
+         
             return RedirectToAction("Index", "Dashboard");
         }
+
 
 
     }
