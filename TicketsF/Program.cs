@@ -19,8 +19,6 @@ builder.Services.AddSession(options =>
 builder.Services.AddDbContext<ticketsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TicketsDbConnection")));
 
-builder.Services.AddScoped<ICorreoServicio, CorreoServicio>();
-
 
 var app = builder.Build();
 

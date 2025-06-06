@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using TicketsF.Models;
 
+namespace TicketsF.Models;
 public class tickets
 {
     [Key]

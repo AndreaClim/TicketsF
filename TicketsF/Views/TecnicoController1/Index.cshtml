@@ -1,5 +1,179 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Panel Técnico";
+    Layout = "_LayoutD";
+
+    var tickets = (ViewBag.Tickets as List<TicketsF.Models.tickets>)?
+                    .Where(t => t.id_estado != 4 && t.id_estado != 5).ToList();
+    var estados = ViewBag.Estados as List<TicketsF.Models.estado>;
+    var prioridades = ViewBag.Prioridades as List<TicketsF.Models.prioridad>;
+    var notificaciones = ViewBag.Notificaciones as List<TicketsF.Models.notificaciones>;
 }
+
+<div class="container mt-4 mb-5">
+    <ul class="nav nav-tabs" id="tecnicoTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">Dashboard</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets" type="button" role="tab">Mis Tickets</button>
+        </li>
+    </ul>
+
+    <div class="tab-content bg-dark text-white p-4 rounded-bottom" id="tecnicoTabsContent">
+        <!-- DASHBOARD -->
+        <div class="tab-pane fade show active" id="dashboard" role="tabpanel">
+            <h4 class="mb-4">Dashboard Técnico</h4>
+            <div class="row text-center mb-4">
+                <!-- 🔔 NOTIFICACIONES DENTRO DEL DASHBOARD -->
+                <div class="row justify-content-center mb-4">
+                    <div class="col-md-8">
+                        <h5 class="mb-3 text-center">Últimas Notificaciones</h5>
+                        @if (notificaciones != null && notificaciones.Any())
+                        {
+                            <div class="list-group" style="max-height: 200px; overflow-y: auto;">
+                                @foreach (var notif in notificaciones.OrderByDescending(n => n.fecha_envio).Take(3))
+                                {
+                                    <div class="list-group-item bg-secondary text-white d-flex justify-content-between align-items-center">
+                                        <span>@notif.mensaje</span>
+                                        <small class="text-muted">@notif.fecha_envio.ToString("g")</small>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">No hay notificaciones.</p>
+                        }
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card bg-success text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Tickets Resueltos</h5>
+                            <p>@ViewBag.TicketsResueltos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-warning text-dark shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">En Progreso</h5>
+                            <p>@ViewBag.TicketsEnProgreso</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-danger text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Abiertos</h5>
+                            <p>@ViewBag.TicketsAbiertos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <div class="card bg-info text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">En Espera</h5>
+                            <p>@ViewBag.TicketsEnEspera</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <div class="card bg-secondary text-white shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Cerrados</h5>
+                            <p>@ViewBag.TicketsCerrados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TICKETS -->
+        <div class="tab-pane fade" id="tickets" role="tabpanel">
+            <h4 class="mb-4">Tickets Asignados</h4>
+            @if (tickets != null && tickets.Any())
+            {
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Título</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Prioridad</th>
+                            <th>Categoría</th>
+                            <th>Actualizar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in tickets)
+                        {
+                            <tr id="ticket-row-@ticket.id_ticket">
+                                <td>@ticket.id_ticket</td>
+                                <td>@ticket.titulo</td>
+                                <td>@ticket.descripcion</td>
+                                <td>
+                                    <select class="form-select" id="estado_@ticket.id_ticket">
+                                        @foreach (var estado in estados)
+                                        {
+                                            <option value="@estado.id_estado" selected="@(ticket.id_estado == estado.id_estado)">
+                                                @estado.nombre
+                                            </option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="form-select" id="prioridad_@ticket.id_ticket">
+                                        @foreach (var prioridad in prioridades)
+                                        {
+                                            <option value="@prioridad.id_prioridad" selected="@(ticket.id_prioridad == prioridad.id_prioridad)">
+                                                @prioridad.nombre
+                                            </option>
+                                        }
+                                    </select>
+                                </td>
+                                <td>@ticket.categoria?.nombre</td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" onclick="actualizarTicket(@ticket.id_ticket)">
+                                        <i class="fas fa-sync-alt"></i> Guardar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No hay tickets asignados.</p>
+            }
+        </div>
+
+    </div>
+</div>
+
+<script>
+        function actualizarTicket(id) {
+        const idEstado = document.getElementById('estado_' + id).value;
+        const idPrioridad = document.getElementById('prioridad_' + id).value;
+
+        $.ajax({
+            url: '/TecnicoController1/ActualizarEstado', // Ajusta la ruta si es necesario
+            type: 'POST',
+            data: { id, idEstado, idPrioridad },
+                success: function () {
+        if (+idEstado === 4 || +idEstado === 5) {  // +idEstado convierte a número
+            $('#ticket-row-' + id).fadeOut(300, function () { $(this).remove(); });
+        } else {
+            alert("Ticket actualizado.");
+        }
+    },
+            error: function () {
+                alert("Error al actualizar el ticket.");
+            }
+        });
+    }
+
+</script>

@@ -1,73 +1,67 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using TicketsF.Models;
-using TicketsF.Servicios;
 using System.Linq;
 
 namespace TicketsF.Controllers
 {
-    [Authorize(Roles = "Técnico")]
-    public class TecnicoController : Controller
+    public class TecnicoController1 : Controller
     {
         private readonly ticketsDbContext _context;
-        private readonly ICorreoServicio _correo;
 
-        public TecnicoController(ticketsDbContext context, ICorreoServicio correo)
+        public TecnicoController1(ticketsDbContext context)
         {
             _context = context;
-            _correo = correo;
         }
 
         public IActionResult Index()
         {
             var idTecnico = HttpContext.Session.GetInt32("id_usuarios");
+            if (!idTecnico.HasValue)
+                return RedirectToAction("Index", "Home");
 
-            var ticketsAsignados = _context.tickets
-                .Where(t => t.id_usuarioE == idTecnico && t.id_estado != 5)
-                .Include(t => t.usuarioC)
-                .Include(t => t.estado)
-                .Include(t => t.prioridad)
+            // Tickets asignados a este técnico
+            var tickets = _context.tickets
+            .Where(t => t.id_usuarioE == idTecnico && t.id_estado != 4 && t.id_estado != 5)
+            .Include(t => t.estado)
+            .Include(t => t.prioridad)
+            .Include(t => t.categoria)
+            .ToList();
+
+
+            // Conteos filtrados por técnico
+            ViewBag.TicketsResueltos = tickets.Count(t => t.id_estado == 4);
+            ViewBag.TicketsAbiertos = tickets.Count(t => t.id_estado == 1);
+            ViewBag.TicketsEnProgreso = tickets.Count(t => t.id_estado == 2);
+            ViewBag.TicketsEnEspera = tickets.Count(t => t.id_estado == 3);
+            ViewBag.TicketsCerrados = _context.tickets.Count(t => t.id_usuarioE == idTecnico && t.id_estado == 5);
+
+            ViewBag.Tickets = tickets;
+            ViewBag.Estados = _context.estado.ToList();
+            ViewBag.Prioridades = _context.prioridad.ToList();
+            ViewBag.Notificaciones = _context.notificaciones
+                .Where(n => n.id_usuarios == idTecnico)
+                .OrderByDescending(n => n.fecha_envio)
                 .ToList();
 
-            var estados = _context.estado.ToList();
-            var prioridades = _context.prioridad.ToList();
-
-            var model = new TecnicoData
-            {
-                TicketsAsignados = ticketsAsignados,
-                Estado = estados,
-                Prioridades = prioridades
-            };
-
-            return View(model);
+            return View();
         }
 
         [HttpPost]
-        public IActionResult ActualizarEstado(int id, int idEstado, int idPrioridad)
-        {
-            var ticket = _context.tickets
-                .Include(t => t.usuarioC)
-                .FirstOrDefault(t => t.id_ticket == id);
+public IActionResult ActualizarEstado(int id, int idEstado, int idPrioridad)
+{
+    var ticket = _context.tickets.FirstOrDefault(t => t.id_ticket == id);
 
-            if (ticket != null)
-            {
-                ticket.id_estado = idEstado;
-                ticket.id_prioridad = idPrioridad;
-                _context.SaveChanges();
+    if (ticket == null)
+        return NotFound();
 
-                // Notificación por correo al cliente
-                var cliente = ticket.usuarioC;
-                if (cliente != null)
-                {
-                    var mensaje = $"Hola {cliente.nombre}, tu ticket #{ticket.id_ticket} ha cambiado de estado a: {_context.estado.Find(idEstado)?.nombre}";
-                    _correo.EnviarCorreo(cliente.correo, "Actualización de Ticket", mensaje);
-                }
+    ticket.id_estado = idEstado;
+    ticket.id_prioridad = idPrioridad;
 
-                return Ok(new { estado = idEstado });
-            }
+    _context.SaveChanges();
 
-            return NotFound();
-        }
+    return Ok();
+}
+
     }
 }

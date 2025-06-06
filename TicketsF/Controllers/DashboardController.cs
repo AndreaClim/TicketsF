@@ -70,12 +70,16 @@ namespace TicketsF.Controllers
                 ticket.id_prioridad = idPrioridad;
                 ticket.id_estado = idEstado;
                 _context.SaveChanges();
+
+                // 🟢 Agrega notificación para el técnico asignado
+                NotificarTecnico(idUsuarioAsignado, ticket.id_ticket);
             }
 
+            // Dashboard data (no se modifica)
             var totalTickets = _context.tickets.Count();
-            var ticketsAbiertos = _context.tickets.Where(t => t.id_estado == 1).Count();
-            var ticketsEnProgreso = _context.tickets.Where(t => t.id_estado == 2).Count();
-            var ticketsResueltos = _context.tickets.Where(t => t.id_estado == 4).Count();
+            var ticketsAbiertos = _context.tickets.Count(t => t.id_estado == 1);
+            var ticketsEnProgreso = _context.tickets.Count(t => t.id_estado == 2);
+            var ticketsResueltos = _context.tickets.Count(t => t.id_estado == 4);
 
             var clientes = _context.usuarios.Where(u => u.roles == "Cliente").ToList();
             var usuarios = _context.usuarios.ToList();
@@ -104,10 +108,32 @@ namespace TicketsF.Controllers
                 Estado = estados
             };
 
-            _context.SaveChanges();
-
             return Ok(idEstado);
         }
+
+        // 🔔 Método privado para enviar notificación al técnico
+        private void NotificarTecnico(int idTecnico, int idTicket)
+        {
+            var tecnico = _context.usuarios.FirstOrDefault(u => u.id_usuarios == idTecnico && u.roles == "Técnico");
+            var ticketExiste = _context.tickets.Any(t => t.id_ticket == idTicket); // ✅ Verificar existencia
+
+            if (tecnico != null && ticketExiste)
+            {
+                var mensaje = $"Se te ha asignado el ticket #{idTicket}. Revisa tu panel técnico.";
+
+                _context.notificaciones.Add(new notificaciones
+                {
+                    id_usuarios = tecnico.id_usuarios,
+                    id_ticket = idTicket,
+                    mensaje = mensaje,
+                    fecha_envio = DateTime.Now
+                });
+
+                _context.SaveChanges();
+            }
+
+        }
+
 
 
         [HttpGet]
@@ -145,28 +171,27 @@ namespace TicketsF.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpPost]
-        public IActionResult Editar(usuarios usuarioActualizado)
+ [HttpPost]
+public IActionResult Editar(usuarios usuarioActualizado)
+{
+    if (ModelState.IsValid)
+    {
+        var usuario = _context.usuarios.FirstOrDefault(u => u.id_usuarios == usuarioActualizado.id_usuarios);
+        if (usuario != null)
         {
-            if (usuarioActualizado != null && usuarioActualizado.id_usuarios != 0)
-            {
-                var usuario = _context.usuarios.FirstOrDefault(u => u.id_usuarios == usuarioActualizado.id_usuarios);
-                if (usuario != null)
-                {
-                    usuario.nombre = usuarioActualizado.nombre;
-                    usuario.apellido = usuarioActualizado.apellido;
-                    usuario.correo = usuarioActualizado.correo;
-                    usuario.telefono = usuarioActualizado.telefono;
-                    usuario.autenticacion = usuarioActualizado.autenticacion;
-                    usuario.roles = usuarioActualizado.roles;
+            usuario.nombre = usuarioActualizado.nombre;
+            usuario.apellido = usuarioActualizado.apellido;
+            usuario.correo = usuarioActualizado.correo;
+            usuario.telefono = usuarioActualizado.telefono;
+            usuario.autenticacion = usuarioActualizado.autenticacion;
+            usuario.roles = usuarioActualizado.roles;
 
-                    _context.SaveChanges();
-                }
-            }
-
-            return RedirectToAction("Index");
+            _context.SaveChanges();
         }
+    }
 
+    return RedirectToAction("Index");
+}
 
 
 

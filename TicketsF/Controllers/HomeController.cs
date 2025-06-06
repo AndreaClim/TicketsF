@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Http;
 using TicketsF.Models;
 using System.Linq;
 using TicketsF.Servicios;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Data;
+using System.Numerics;
 
 namespace TicketsF.Controllers
 {
@@ -34,40 +37,48 @@ namespace TicketsF.Controllers
                 return View();
             }
 
-            
+
             var usuario = _context.usuarios
-                .FirstOrDefault(u => u.correo == correo && u.contrasenia == contrasenia);
+        .FirstOrDefault(u => u.correo == correo && u.contrasenia == contrasenia);
 
             if (usuario != null)
             {
-                
                 HttpContext.Session.SetInt32("id_usuarios", usuario.id_usuarios);
                 HttpContext.Session.SetString("correo", usuario.correo);
 
-               
-                if (usuario.roles == "Administrador")
+                // Redirección basada en rol
+                switch (usuario.roles)
                 {
-                    return RedirectToAction("Index", "Dashboard");
-                }
+                    case "Administrador":
+                        return RedirectToAction("Index", "Dashboard");
+
+                    case "Técnico":
+                        return RedirectToAction("Index", "TecnicoController1");
 
 
-                if (usuario.roles == "Técnico")
-                {
-                    return RedirectToAction("Index", "TecnicoController1");
+                    case "Cliente":
+                        return RedirectToAction("GenerarTicket", "Usuarios");
+
+                    default:
+                        ViewData["Error"] = "Rol no válido.";
+                        break;
                 }
-                else if (usuario.roles == "Cliente")
-                {
-                    return RedirectToAction("GenerarTicket", "Usuarios");
-                }
-                
             }
             else
             {
-                
                 ViewData["Error"] = "Correo o contraseña incorrectos.";
             }
 
             return View();
         }
-    }
+
+
+
+
+
+
+
+
+        }
 }
+
