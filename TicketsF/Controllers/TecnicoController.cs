@@ -2,16 +2,19 @@
 using Microsoft.EntityFrameworkCore;
 using TicketsF.Models;
 using System.Linq;
+using TicketsF.Services;
 
 namespace TicketsF.Controllers
 {
     public class TecnicoController1 : Controller
     {
         private readonly ticketsDbContext _context;
+        private readonly correo _correo;
 
-        public TecnicoController1(ticketsDbContext context)
+        public TecnicoController1(ticketsDbContext context, correo correo)
         {
             _context = context;
+            _correo = correo;
         }
 
         public IActionResult Index()
@@ -48,20 +51,78 @@ namespace TicketsF.Controllers
         }
 
         [HttpPost]
-public IActionResult ActualizarEstado(int id, int idEstado, int idPrioridad)
-{
-    var ticket = _context.tickets.FirstOrDefault(t => t.id_ticket == id);
 
-    if (ticket == null)
-        return NotFound();
+        public IActionResult ActualizarEstado(int id, int idEstado, int idPrioridad)
+        {
+            var ticket = _context.tickets
+                .Include(t => t.usuarioC)   // Cliente
+                .Include(t => t.usuarioE)   // Técnico asignado
+                .Include(t => t.estado)
+                .Include(t => t.prioridad)
+                .FirstOrDefault(t => t.id_ticket == id);
 
-    ticket.id_estado = idEstado;
-    ticket.id_prioridad = idPrioridad;
+            if (ticket == null)
+                return NotFound();
 
-    _context.SaveChanges();
+            ticket.id_estado = idEstado;
+            ticket.id_prioridad = idPrioridad;
 
-    return Ok();
-}
+            _context.SaveChanges();
+
+            // 🔁 Asegurarse que las relaciones se recarguen
+            _context.Entry(ticket).Reference(t => t.estado).Load();
+            _context.Entry(ticket).Reference(t => t.prioridad).Load();
+            _context.Entry(ticket).Reference(t => t.usuarioE).Load();
+
+            // Enviar notificación por correo al cliente
+            NotificarCambioEstadoUsuario(ticket);
+
+            return Ok();
+        }
+
+
+        private void NotificarCambioEstadoUsuario(tickets ticket)
+        {
+            if (ticket.usuarioC != null && !string.IsNullOrEmpty(ticket.usuarioC.correo))
+            {
+                string nombreTecnico = ticket.usuarioE != null
+                    ? $"{ticket.usuarioE.nombre} {ticket.usuarioE.apellido}"
+                    : "No asignado";
+
+                string correoTecnico = ticket.usuarioE?.correo ?? "No disponible";
+                string nombreEstado = ticket.estado?.nombre ?? "Desconocido";
+                string nombrePrioridad = ticket.prioridad?.nombre ?? "Desconocida";
+
+                string asunto = $"🔔 Actualización de su ticket #{ticket.id_ticket}";
+
+                string cuerpo = $@"
+===============================================
+       📢 ACTUALIZACIÓN DE SU TICKET
+===============================================
+
+Hola {ticket.usuarioC.nombre} 👋,
+
+Le informamos que su ticket con título:
+'{ticket.titulo}'
+
+➡️ Estado actual    : {nombreEstado}
+⚠️ Prioridad        : {nombrePrioridad}
+
+👨‍🔧 Técnico asignado: {nombreTecnico}
+📧 Correo contacto  : {correoTecnico}
+
+Gracias por confiar en nuestro servicio de soporte.
+
+===============================================
+           💼 Equipo de Soporte Técnico
+===============================================";
+
+                _correo.enviar(ticket.usuarioC.correo, asunto, cuerpo);
+            }
+        }
+
+
+
 
     }
 }

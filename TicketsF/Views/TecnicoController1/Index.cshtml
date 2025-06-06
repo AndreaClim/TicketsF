@@ -103,7 +103,6 @@
                             <th>Descripción</th>
                             <th>Estado</th>
                             <th>Prioridad</th>
-                            <th>Categoría</th>
                             <th>Actualizar</th>
                         </tr>
                     </thead>
@@ -134,7 +133,7 @@
                                         }
                                     </select>
                                 </td>
-                                <td>@ticket.categoria?.nombre</td>
+                               
                                 <td>
                                     <button class="btn btn-sm btn-success" onclick="actualizarTicket(@ticket.id_ticket)">
                                         <i class="fas fa-sync-alt"></i> Guardar

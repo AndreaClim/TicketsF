@@ -2,16 +2,19 @@
 using TicketsF.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using TicketsF.Services;
 
 namespace TicketsF.Controllers
 {
     public class DashboardController : Controller
     {
         private readonly ticketsDbContext _context;
+        private readonly correo _correo;
 
-        public DashboardController(ticketsDbContext context)
+        public DashboardController(ticketsDbContext context, correo correo)
         {
             _context = context;
+            _correo = correo;
         }
 
         // Acción para mostrar el Dashboard
@@ -27,7 +30,7 @@ namespace TicketsF.Controllers
             var clientes = _context.usuarios.Where(u => u.roles == "Cliente").ToList();
             var usuarios = _context.usuarios.ToList();
             var tickets = _context.tickets
-                .Where(t => t.id_estado != 5) 
+                .Where(t => t.id_estado != 5)
                 .Include(t => t.usuarioC)
                 .Include(t => t.usuarioE)
                 .Include(t => t.estado)
@@ -56,11 +59,12 @@ namespace TicketsF.Controllers
             return View(dashboardData);
         }
 
-
         public IActionResult ResolverTicket(int id, int idUsuarioAsignado, int idPrioridad, int idEstado)
         {
             var ticket = _context.tickets
+                .Include(t => t.usuarioC)
                 .Include(t => t.usuarioE)
+                .Include(t => t.estado)
                 .Include(t => t.prioridad)
                 .FirstOrDefault(t => t.id_ticket == id);
 
@@ -71,51 +75,29 @@ namespace TicketsF.Controllers
                 ticket.id_estado = idEstado;
                 _context.SaveChanges();
 
-                // 🟢 Agrega notificación para el técnico asignado
+                // 🔁 Recargar todas las relaciones modificadas
+                _context.Entry(ticket).Reference(t => t.estado).Load();
+                _context.Entry(ticket).Reference(t => t.prioridad).Load();
+                _context.Entry(ticket).Reference(t => t.usuarioE).Load(); // <- IMPORTANTE
+
+                // Notificar técnico asignado
                 NotificarTecnico(idUsuarioAsignado, ticket.id_ticket);
+
+                // Notificar al usuario creador del ticket sobre cambio de estado
+                NotificarCambioEstadoUsuario(ticket);
             }
-
-            // Dashboard data (no se modifica)
-            var totalTickets = _context.tickets.Count();
-            var ticketsAbiertos = _context.tickets.Count(t => t.id_estado == 1);
-            var ticketsEnProgreso = _context.tickets.Count(t => t.id_estado == 2);
-            var ticketsResueltos = _context.tickets.Count(t => t.id_estado == 4);
-
-            var clientes = _context.usuarios.Where(u => u.roles == "Cliente").ToList();
-            var usuarios = _context.usuarios.ToList();
-            var tickets = _context.tickets
-                .Where(t => t.id_estado != 5)
-                .Include(t => t.usuarioC)
-                .Include(t => t.usuarioE)
-                .Include(t => t.estado)
-                .Include(t => t.prioridad)
-                .Include(t => t.categoria)
-                .ToList();
-
-            var prioridades = _context.prioridad.ToList();
-            var estados = _context.estado.ToList();
-
-            var dashboardData = new DashboardData
-            {
-                TotalTickets = totalTickets,
-                TicketsAbiertos = ticketsAbiertos,
-                TicketsEnProgreso = ticketsEnProgreso,
-                TicketsResueltos = ticketsResueltos,
-                Clientes = clientes,
-                Usuarios = usuarios,
-                Tickets = tickets,
-                Prioridades = prioridades,
-                Estado = estados
-            };
 
             return Ok(idEstado);
         }
 
-        // 🔔 Método privado para enviar notificación al técnico
+
+
+
+        // Notificar técnico asignado
         private void NotificarTecnico(int idTecnico, int idTicket)
         {
             var tecnico = _context.usuarios.FirstOrDefault(u => u.id_usuarios == idTecnico && u.roles == "Técnico");
-            var ticketExiste = _context.tickets.Any(t => t.id_ticket == idTicket); // ✅ Verificar existencia
+            var ticketExiste = _context.tickets.Any(t => t.id_ticket == idTicket);
 
             if (tecnico != null && ticketExiste)
             {
@@ -131,7 +113,46 @@ namespace TicketsF.Controllers
 
                 _context.SaveChanges();
             }
+        }
 
+        // Notificar al usuario creador del ticket sobre cambio de estado
+        private void NotificarCambioEstadoUsuario(tickets ticket)
+        {
+            if (ticket.usuarioC != null && !string.IsNullOrEmpty(ticket.usuarioC.correo))
+            {
+                string nombreTecnico = ticket.usuarioE != null ? $"{ticket.usuarioE.nombre} {ticket.usuarioE.apellido}" : "No asignado";
+                string correoTecnico = ticket.usuarioE?.correo ?? "N/A";
+                string nombreEstado = ticket.estado?.nombre ?? "Desconocido";
+                string nombrePrioridad = ticket.prioridad?.nombre ?? "Desconocida";
+
+                string asuntoCorreo = $"Actualización del estado del ticket #{ticket.id_ticket}";
+
+                string cuerpoCorreo = $@"
+────────────────────────────────────
+         ACTUALIZACIÓN DE TICKET
+────────────────────────────────────
+
+Hola {ticket.usuarioC.nombre},
+
+Te informamos que tu ticket ha sido actualizado.
+
+🆔 Ticket: #{ticket.id_ticket}
+📄 Título: {ticket.titulo}
+
+📌 Estado actual: {nombreEstado}
+⚠️ Prioridad: {nombrePrioridad}
+
+👨‍💼 Usuario asignado: {nombreTecnico}
+📧 Correo de contacto: {correoTecnico}
+
+Si tienes dudas o necesitas más información, puedes responder a este correo.
+
+────────────────────────────────────
+Soporte Técnico – TicketsF
+";
+
+                _correo.enviar(ticket.usuarioC.correo, asuntoCorreo, cuerpoCorreo);
+            }
         }
 
 
@@ -144,7 +165,6 @@ namespace TicketsF.Controllers
             if (usuario == null)
                 return NotFound();
 
-          
             var comentarios = _context.comentarios.Where(c => c.id_usuarios == id).ToList();
             _context.comentarios.RemoveRange(comentarios);
 
@@ -164,13 +184,11 @@ namespace TicketsF.Controllers
             }
             _context.tickets.RemoveRange(ticketsTecnico);
 
-
             var historial = _context.historial.Where(h => h.id_ticket != null &&
                 (_context.tickets.Any(t => t.id_ticket == h.id_ticket &&
                 (t.id_usuarioC == id || t.id_usuarioE == id)))).ToList();
             _context.historial.RemoveRange(historial);
 
-          
             _context.usuarios.Remove(usuario);
 
             _context.SaveChanges();
@@ -200,9 +218,6 @@ namespace TicketsF.Controllers
             return RedirectToAction("Index");
         }
 
-
-
-
         [HttpPost]
         public IActionResult CrearUsuario(usuarios nuevoUsuario)
         {
@@ -211,11 +226,5 @@ namespace TicketsF.Controllers
 
             return RedirectToAction("Index");
         }
-
-
-
-
-
-
     }
 }

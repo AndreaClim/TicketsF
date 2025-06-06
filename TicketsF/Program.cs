@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TicketsF.Models;
+using TicketsF.Services;
 using TicketsF.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddDbContext<ticketsDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("TicketsDbConnection")));
 
+builder.Services.AddScoped<correo>();
 
 var app = builder.Build();
 
