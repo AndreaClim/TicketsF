@@ -1,9 +1,7 @@
 ﻿@model TicketsF.Models.DashboardData
 @using Newtonsoft.Json
 
-
 @{
-
     ViewData["Title"] = "Panel de Empleado - TechSoluciones";
     Layout = "_LayoutD";
 }
@@ -92,7 +90,15 @@
                             <td>@cliente.correo</td>
                             <td>@cliente.telefono</td>
                             <td>
-                                <button class="btn btn-sm btn-warning" onclick="editUsuario(@cliente.id_usuarios)">
+                                <button class="btn btn-sm btn-warning"
+                                        data-id="@cliente.id_usuarios"
+                                        data-nombre="@cliente.nombre"
+                                        data-apellido="@cliente.apellido"
+                                        data-correo="@cliente.correo"
+                                        data-telefono="@cliente.telefono"
+                                        data-autenticacion="@cliente.autenticacion"
+                                        data-roles="@cliente.roles"
+                                        onclick="editUsuario(this)">
                                     <i class="fas fa-edit"></i> Editar
                                 </button>
                                 <button class="btn btn-sm btn-danger" onclick="deleteItem(@cliente.id_usuarios)">
@@ -172,7 +178,12 @@
 
         <!-- USUARIOS -->
         <div class="tab-pane fade" id="usuarios" role="tabpanel">
-            <h4>Administración de Usuarios</h4>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>Administración de Usuarios</h4>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoUsuarioModal">
+                    <i class="fas fa-user-plus"></i> Nuevo Usuario
+                </button>
+            </div>
             <table class="table table-dark table-striped table-hover">
                 <thead>
                     <tr>
@@ -194,7 +205,15 @@
                             <td>@usuario.autenticacion</td>
                             <td>@usuario.roles</td>
                             <td>
-                                <button class="btn btn-sm btn-warning" onclick="editUsuario(@usuario.id_usuarios)">
+                                <button class="btn btn-sm btn-warning"
+                                        data-id="@usuario.id_usuarios"
+                                        data-nombre="@usuario.nombre"
+                                        data-apellido="@usuario.apellido"
+                                        data-correo="@usuario.correo"
+                                        data-telefono="@usuario.telefono"
+                                        data-autenticacion="@usuario.autenticacion"
+                                        data-roles="@usuario.roles"
+                                        onclick="editUsuario(this)">
                                     <i class="fas fa-edit"></i> Editar
                                 </button>
                                 <button class="btn btn-sm btn-danger" onclick="deleteItem(@usuario.id_usuarios)">
@@ -209,79 +228,90 @@
     </div>
 </div>
 
-<!-- MODAL PARA EDITAR USUARIO -->
-<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+<!-- MODAL NUEVO USUARIO -->
+<div class="modal fade" id="nuevoUsuarioModal" tabindex="-1" aria-labelledby="nuevoUsuarioModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content bg-dark text-white">
             <div class="modal-header">
-                <h5 class="modal-title" id="editUserModalLabel">Editar Usuario</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <h5 class="modal-title">Nuevo Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <form id="editUserForm" method="post" action="/Dashboard/Editar">
-                    <input type="hidden" id="editId" name="id_usuarios" />
-                    <div class="mb-3">
-                        <label for="editNombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control" id="editNombre" name="nombre" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editApellido" class="form-label">Apellido</label>
-                        <input type="text" class="form-control" id="editApellido" name="apellido" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editCorreo" class="form-label">Correo</label>
-                        <input type="email" class="form-control" id="editCorreo" name="correo" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTelefono" class="form-label">Teléfono</label>
-                        <input type="text" class="form-control" id="editTelefono" name="telefono" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editAutenticacion" class="form-label">Autenticación</label>
-                        <input type="text" class="form-control" id="editAutenticacion" name="autenticacion" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="editRoles" class="form-label">Rol</label>
-                        <select class="form-select" id="editRoles" name="roles">
-                            <option value="Cliente">Cliente</option>
-                            <option value="Empleado">Empleado</option>
-                            <option value="Administrador">Administrador</option>
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    </div>
-                </form>
-            </div>
+            <form method="post" action="/Dashboard/CrearUsuario">
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label">Nombre</label><input name="nombre" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Apellido</label><input name="apellido" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Correo</label><input type="email" name="correo" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Contraseña</label><input type="password" name="contrasenia" class="form-control" required></div>
+                    <div class="mb-3"><label class="form-label">Teléfono</label><input name="telefono" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label">Autenticación</label><select name="autenticacion" class="form-select"><option>Local</option><option>Terceros</option></select></div>
+                    <div class="mb-3"><label class="form-label">Rol</label><select name="roles" class="form-select"><option>Cliente</option><option>Técnico</option><option>Administrador</option></select></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<!-- Scripts -->
+<!-- MODAL EDITAR USUARIO -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editUserForm" method="post" action="/Dashboard/Editar">
+                <div class="modal-body">
+                    <input type="hidden" id="editId" name="id_usuarios" />
+                    <div class="mb-3"><label>Nombre</label><input id="editNombre" name="nombre" class="form-control" required /></div>
+                    <div class="mb-3"><label>Apellido</label><input id="editApellido" name="apellido" class="form-control" required /></div>
+                    <div class="mb-3"><label>Correo</label><input id="editCorreo" name="correo" class="form-control" required /></div>
+                    <div class="mb-3"><label>Teléfono</label><input id="editTelefono" name="telefono" class="form-control" /></div>
+                    <div class="mb-3">
+                        <label>Autenticación</label>
+                        <select id="editAutenticacion" name="autenticacion" class="form-select">
+                            <option>Local</option>
+                            <option>Terceros</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Rol</label>
+                        <select id="editRoles" name="roles" class="form-select">
+                            <option>Cliente</option>
+                            <option>Técnico</option>
+                            <option>Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script>
     function resolverTicket(id) {
-        var idUsuarioAsignado = document.getElementById('usuarioE_' + id).value;
-        var idPrioridad = document.getElementById('prioridad_' + id).value;
-        var idEstado = document.getElementById('estado_' + id).value;
+        const idUsuarioAsignado = document.getElementById('usuarioE_' + id).value;
+        const idPrioridad = document.getElementById('prioridad_' + id).value;
+        const idEstado = document.getElementById('estado_' + id).value;
 
         $.ajax({
             url: '/Dashboard/ResolverTicket',
             type: 'GET',
-            data: {
-                id: id,
-                idUsuarioAsignado: idUsuarioAsignado,
-                idPrioridad: idPrioridad,
-                idEstado: idEstado
-            },
+            data: { id, idUsuarioAsignado, idPrioridad, idEstado },
             success: function (estadoRecibido) {
                 if (estadoRecibido == 5) {
-                    $('#ticket-row-' + id).fadeOut(300, function () {
-                        $(this).remove();
-                    });
+                    $('#ticket-row-' + id).fadeOut(300, function () { $(this).remove(); });
                 } else {
                     alert("Ticket actualizado con estado ID: " + estadoRecibido);
                 }
@@ -298,18 +328,24 @@
         }
     }
 
-    function editUsuario(id) {
-        const usuarios = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Usuarios));
-        const user = usuarios.find(u => u.id_usuarios === id);
-        if (user) {
-            $('#editId').val(user.id_usuarios);
-            $('#editNombre').val(user.nombre);
-            $('#editApellido').val(user.apellido);
-            $('#editCorreo').val(user.correo);
-            $('#editTelefono').val(user.telefono);
-            $('#editAutenticacion').val(user.autenticacion);
-            $('#editRoles').val(user.roles);
-            $('#editUserModal').modal('show');
-        }
+    function editUsuario(button) {
+        const id = $(button).data('id');
+        const nombre = $(button).data('nombre');
+        const apellido = $(button).data('apellido');
+        const correo = $(button).data('correo');
+        const telefono = $(button).data('telefono');
+        const autenticacion = $(button).data('autenticacion');
+        const roles = $(button).data('roles');
+
+        $('#editId').val(id);
+        $('#editNombre').val(nombre);
+        $('#editApellido').val(apellido);
+        $('#editCorreo').val(correo);
+        $('#editTelefono').val(telefono);
+        $('#editAutenticacion').val(autenticacion);
+        $('#editRoles').val(roles);
+
+        $('#editUserModal').modal('show');
     }
 </script>
+

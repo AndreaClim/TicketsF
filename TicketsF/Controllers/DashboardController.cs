@@ -146,26 +146,39 @@ namespace TicketsF.Controllers
         }
 
         [HttpPost]
-        public IActionResult Editar(usuarios usuarioEditado)
+        public IActionResult Editar(usuarios usuarioActualizado)
         {
-            var usuario = _context.usuarios.FirstOrDefault(u => u.id_usuarios == usuarioEditado.id_usuarios);
+            if (usuarioActualizado != null && usuarioActualizado.id_usuarios != 0)
+            {
+                var usuario = _context.usuarios.FirstOrDefault(u => u.id_usuarios == usuarioActualizado.id_usuarios);
+                if (usuario != null)
+                {
+                    usuario.nombre = usuarioActualizado.nombre;
+                    usuario.apellido = usuarioActualizado.apellido;
+                    usuario.correo = usuarioActualizado.correo;
+                    usuario.telefono = usuarioActualizado.telefono;
+                    usuario.autenticacion = usuarioActualizado.autenticacion;
+                    usuario.roles = usuarioActualizado.roles;
 
-            if (usuario == null)
-                return NotFound();
-
-            usuario.nombre = usuarioEditado.nombre;
-            usuario.apellido = usuarioEditado.apellido;
-            usuario.correo = usuarioEditado.correo;
-            usuario.telefono = usuarioEditado.telefono;
-            usuario.autenticacion = usuarioEditado.autenticacion;
-            usuario.roles = usuarioEditado.roles;
-
-            _context.SaveChanges();
+                    _context.SaveChanges();
+                }
+            }
 
             return RedirectToAction("Index");
         }
 
 
+
+
+
+        [HttpPost]
+        public IActionResult CrearUsuario(usuarios nuevoUsuario)
+        {
+            _context.usuarios.Add(nuevoUsuario);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
 
 
 
